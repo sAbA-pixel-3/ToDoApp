@@ -3,14 +3,14 @@ from PyQt5.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton,
     QListWidget, QListWidgetItem, QCalendarWidget
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QDateTime
 from PyQt5.QtGui import QFont
 
 
 class ToDoApp(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("To-Do List App with Calendar")
+        self.setWindowTitle("To-Do List App with Date and Time")
         self.setGeometry(100, 100, 500, 400)
 
         self.tasks = {}
@@ -60,8 +60,14 @@ class ToDoApp(QWidget):
         if task:
             selected_date = self.calendar.selectedDate().toString("yyyy-MM-dd")
 
+            # Get the current date and time
+            current_datetime = QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss")
+
+            # Combine task with date and time
+            task_text = f"{task} (Added: {current_datetime})"
+
             # Create a task item
-            task_item = QListWidgetItem(task)
+            task_item = QListWidgetItem(task_text)
             task_item.setFlags(task_item.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsEditable)
             task_item.setCheckState(Qt.Unchecked)
 
