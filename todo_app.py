@@ -1,5 +1,8 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, QListWidget, QListWidgetItem, QCalendarWidget
+from PyQt5.QtWidgets import (
+    QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton,
+    QListWidget, QListWidgetItem, QCalendarWidget
+)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 
@@ -8,15 +11,20 @@ class ToDoApp(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("To-Do List App with Calendar")
-        self.setGeometry(100, 100, 600, 400)
+        self.setGeometry(100, 100, 500, 400)
 
         self.tasks = {}
 
         # Main layout
         self.layout = QVBoxLayout()
 
-        # Calendar
+        # Calendar with reduced size
         self.calendar = QCalendarWidget()
+        self.calendar.setFixedSize(300, 200)  # Set the calendar's fixed size
+        calendar_font = QFont()
+        calendar_font.setPointSize(8)  # Smaller font for a compact look
+        self.calendar.setFont(calendar_font)
+
         self.layout.addWidget(self.calendar)
 
         # Task input field and buttons
@@ -40,8 +48,9 @@ class ToDoApp(QWidget):
         self.add_button.clicked.connect(self.add_task)
         self.delete_button.clicked.connect(self.delete_task)
 
-        # Update tasks when the calendar date changes
+        # Connect calendar selection and task completion toggle
         self.calendar.selectionChanged.connect(self.load_tasks_for_date)
+        self.task_list.itemChanged.connect(self.toggle_task_completion)
 
         # Set layout
         self.setLayout(self.layout)
@@ -53,7 +62,7 @@ class ToDoApp(QWidget):
 
             # Create a task item
             task_item = QListWidgetItem(task)
-            task_item.setFlags(task_item.flags() | Qt.ItemIsUserCheckable)
+            task_item.setFlags(task_item.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsEditable)
             task_item.setCheckState(Qt.Unchecked)
 
             # Add task to the current date's list
@@ -82,6 +91,14 @@ class ToDoApp(QWidget):
         if selected_date in self.tasks:
             for task_item in self.tasks[selected_date]:
                 self.task_list.addItem(task_item)
+
+    def toggle_task_completion(self, item):
+        font = item.font()
+        if item.checkState() == Qt.Checked:
+            font.setStrikeOut(True)  # Strike through completed task
+        else:
+            font.setStrikeOut(False)  # Remove strike-through
+        item.setFont(font)
 
 
 if __name__ == "__main__":
